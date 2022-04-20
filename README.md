@@ -1,3 +1,2 @@
 # replication-materials-jiehanL
-replication-materials-jiehanL created by GitHub Classroom
 The repertoire of autocratic regimes surviving strategies has greatly extended with the development of modern information and communications technology (ICT). Currently, the relationship between these current digital tools and established, traditional autocratic survival strategies is under-studied. This project aims at using computational methods to depict the use of pro-regime social bots in the events of social movements and using causal inference methods to study its relations with, and effect on, repression and co-optation. 
