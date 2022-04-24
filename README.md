@@ -4,7 +4,7 @@ The repertoire of autocratic regimes surviving strategies has greatly extended w
 
 The code and data in this repository is used for producing reproducible results pertains to the study, it is also in partial fulfillment of the requirements for MACS 30200 "Perspectives on Computational Research" at the University of Chicago.
 
-## Workflow 
+## Dependencies
 The code is written in Python 3.9.7 and R 3.6.1. All of the Python packages can be installed by running the following in the terminal (with the requirements.txt file included in this repository):
 
 ```
@@ -18,3 +18,7 @@ do
   Rscript -e "devtools::install_version('"$package"', version='"$version"')"; 
 done < "requirements.txt"
 ```
+
+## Workflow and preliminary results
+
+P.W.D. Charles, Project Title, (2013), GitHub repository, https://github.com/charlespwd/project-title
