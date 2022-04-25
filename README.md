@@ -16,9 +16,10 @@ For R packages, you might need to run the following in the terminal (with requir
 while IFS=" " read -r package version; 
 do 
   Rscript -e "devtools::install_version('"$package"', version='"$version"')"; 
-done < "requirements.txt"
+done < "requirements_r.txt"
 ```
 
 ## Workflow and preliminary results
+
 
 P.W.D. Charles, Project Title, (2013), GitHub repository, https://github.com/charlespwd/project-title
