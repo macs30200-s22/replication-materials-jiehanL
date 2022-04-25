@@ -32,7 +32,7 @@ The above plots show the number of tweets before and after Russian Duma election
 (#putin, #vladimir, #Crimea, #country, #Ukraine, #new, #the president, #Navalny, #USA, #Russia, #medvedev, #declare). 
 There is often a spike in tweet counts after elections. Considering that all the tweet data is collected according to the above hashtag, it can be derived that these tweets are related to the election and the protest。
 
-To replicate these results, you can use the data from  ```2011_tweets.zip``` and ```2016_tweets.zip``` data and run the the chuck of code ```twitter data visualization``` at the ```data visualization.Rmd``` file. 
+To replicate these results, you can use the data from  ```2011_tweets.zip``` and ```2016_tweets.zip``` data and run the the chuck of code ```twitter data visualization``` at the ```data_visualization.Rmd``` file. 
 
 ### detected social bots tweets around election and protest 
 1. detected social bots tweets around 2011 Russian Duma Election and protest
@@ -45,7 +45,7 @@ The above plots show the social bots tweets before and after Russian Duma electi
 From the 2011 figure, we can see that the number of social bots tweets was high before the election and dropped on the Election Day. With the start of the first round of social protests, the number of social bots grew and fell between the two protests, until the second round of protests on December 24th they increased again. 
 In the 2016 figure, the number of social bots is low before the election and on election day, and the number of social bots does not increase until the protest starts. 
 
-To replicate these results, you can use the data from  ```classification_result.csv``` and run the the chuck of code ```classification result visualization``` at the ```data visualization.Rmd``` file. 
+To replicate these results, you can use the data from  ```classification_result.csv``` and run the the chuck of code ```classification result visualization``` at the ```data_visualization.Rmd``` file. 
 
 ## What do we know so far? 
 The above results suggest that the social bots has been used to meddle with election and social protests in Russia: along with the social protests, there are usually a surge in pro-regime social bots deployment. It is also worth noticing that the percentage of social bots in 2011 protest is higher than in 2016 protest, but social bots depoyment in 2016 protest is more timely and prompt, indicating that the government is more experienced in information manipulation online. The next step would be looking into the interaction among social bots deployment, repression, and co-optation. 
