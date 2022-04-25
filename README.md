@@ -48,8 +48,9 @@ In the 2016 figure, the number of social bots is low before the election and on 
 To replicate these results, you can use the data from  ```classification_result.csv``` and run the the chuck of code ```classification result visualization``` at the ```data_visualization.Rmd``` file. 
 
 ## What do we know so far? 
-The above results suggest that the social bots has been used to meddle with election and social protests in Russia: along with the social protests, there are usually a surge in pro-regime social bots deployment. It is also worth noticing that the percentage of social bots in 2011 protest is higher than in 2016 protest, but social bots depoyment in 2016 protest is more timely and prompt, indicating that the government is more experienced in information manipulation online. The next step would be looking into the interaction among social bots deployment, repression, and co-optation. 
+The above results suggest that the social bots has been used to meddle with election and social protests in Russia: along with the social protests, there are usually a surge in pro-regime social bots deployment. It is also worth noticing that the percentage of social bots in 2011 protest is higher than in 2016 protest, but social bots depoyment in 2016 protest is more timely and prompt, indicating that the government is more experienced in information manipulation online. 
+The next step would be looking into the interaction among social bots deployment, repression, and co-optation. 
 
 ## Citation
-If you use this repository for a scientific publication, you can cite the following GitHub repository URL as it is just preliminary result:
+If you use this repository for a scientific publication, you can cite the following GitHub repository URL as it is just preliminary result, it is currently private but I will make it public latter on this week:
 L. Jiehan, Russia Social Bots and Autocrats' Surviving Strategies, (2021), GitHub repository, https://github.com/macs30200-s22/replication-materials-jiehanL/edit/main/README.md
