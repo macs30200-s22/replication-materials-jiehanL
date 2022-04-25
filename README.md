@@ -20,7 +20,18 @@ done < "requirements_r.txt"
 ```
 
 ## Workflow and preliminary results
-![tweets_around_election_2011](https://user-images.githubusercontent.com/65253017/165015909-7e4d37bd-d97c-47bc-970f-7145ceaf2553.png)
 
+### collected tweets around election and protest 
+1. collected tweets around 2011 Russian Duma Election and protest
+![tweets_around_election_2011](https://user-images.githubusercontent.com/65253017/165016966-800b721c-e3e3-431e-8fb1-a439d4629026.png)
+2. collected tweets around 2016 Russian Duma Election and protest
+![tweets_around_election_2016](https://user-images.githubusercontent.com/65253017/165016970-26b68e88-3f59-4472-82b1-0b02db94b18d.png)
+
+### detected social bots tweets around election and protest 
+1. detected social bots tweets around 2011 Russian Duma Election and protest
+![bots_around_election_2011](https://user-images.githubusercontent.com/65253017/165017137-72dc3c73-5033-49ca-84b6-80938350263f.png)
+
+2. detected social bots tweets around 2016 Russian Duma Election and protest
+![bots_around_election_2016](https://user-images.githubusercontent.com/65253017/165017168-c15e37c8-44b0-41b4-9098-45e3b14e277e.png)
 
 P.W.D. Charles, Project Title, (2013), GitHub repository, https://github.com/charlespwd/project-title
