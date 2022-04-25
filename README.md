@@ -32,7 +32,7 @@ The above plots show the number of tweets before and after Russian Duma election
 (#putin, #vladimir, #Crimea, #country, #Ukraine, #new, #the president, #Navalny, #USA, #Russia, #medvedev, #declare). 
 There is often a spike in tweet counts after elections. Considering that all the tweet data is collected according to the above hashtag, it can be derived that these tweets are related to the election and the protest。
 
-To replicate these results, you can use the data from  ```2011_tweets.zip``` and ```2016_tweets.zip``` data and run the the chuck of code ```twitter data visualization``` at the ```data visualization.Rmd`` file. 
+To replicate these results, you can use the data from  ```2011_tweets.zip``` and ```2016_tweets.zip``` data and run the the chuck of code ```twitter data visualization``` at the ```data visualization.Rmd``` file. 
 
 ### detected social bots tweets around election and protest 
 1. detected social bots tweets around 2011 Russian Duma Election and protest
