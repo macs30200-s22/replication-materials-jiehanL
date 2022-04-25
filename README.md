@@ -45,10 +45,11 @@ The above plots show the social bots tweets before and after Russian Duma electi
 From the 2011 figure, we can see that the number of social bots tweets was high before the election and dropped on the Election Day. With the start of the first round of social protests, the number of social bots grew and fell between the two protests, until the second round of protests on December 24th they increased again. 
 In the 2016 figure, the number of social bots is low before the election and on election day, and the number of social bots does not increase until the protest starts. 
 
-To replicate these results, you can use the data from  ```classification_result.csv``` and run the the chuck of code ```classification result visualization``` at the ```data visualization.Rmd`` file. 
+To replicate these results, you can use the data from  ```classification_result.csv``` and run the the chuck of code ```classification result visualization``` at the ```data visualization.Rmd``` file. 
 
 ## What do we know so far? 
 The above results suggest that the social bots has been used to meddle with election and social protests in Russia: along with the social protests, there are usually a surge in pro-regime social bots deployment. It is also worth noticing that the percentage of social bots in 2011 protest is higher than in 2016 protest, but social bots depoyment in 2016 protest is more timely and prompt, indicating that the government is more experienced in information manipulation online. The next step would be looking into the interaction among social bots deployment, repression, and co-optation. 
 
+## Citation
 If you use this repository for a scientific publication, you can cite the following GitHub repository URL as it is just preliminary result:
 L. Jiehan, Russia Social Bots and Autocrats' Surviving Strategies, (2021), GitHub repository, https://github.com/macs30200-s22/replication-materials-jiehanL/edit/main/README.md
