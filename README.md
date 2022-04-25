@@ -20,6 +20,7 @@ done < "requirements_r.txt"
 ```
 
 ## Workflow and preliminary results
+![tweets_around_election_2011](https://user-images.githubusercontent.com/65253017/165015909-7e4d37bd-d97c-47bc-970f-7145ceaf2553.png)
 
 
 P.W.D. Charles, Project Title, (2013), GitHub repository, https://github.com/charlespwd/project-title
