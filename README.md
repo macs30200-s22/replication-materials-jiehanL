@@ -27,6 +27,13 @@ done < "requirements_r.txt"
 2. collected tweets around 2016 Russian Duma Election and protest
 ![tweets_around_election_2016](https://user-images.githubusercontent.com/65253017/165016970-26b68e88-3f59-4472-82b1-0b02db94b18d.png)
 
+The above plots show the number of tweets before and after Russian Duma elections in 2011 and 2016. All the tweets were collected through *twint* package through searching hashtag:
+#путин, #владимир, #крым, #стpaна, #Украина, #новый, #президент, #Навальный, #сша, #россия, #медведев, #заявлять
+(#putin, #vladimir, #Crimea, #country, #Ukraine, #new, #the president, #Navalny, #USA, #Russia, #medvedev, #declare). 
+The results show 
+
+To replicate these results, you can use the data from  ```2011_tweets.zip``` and ```2016_tweets.zip``` data and run the 
+
 ### detected social bots tweets around election and protest 
 1. detected social bots tweets around 2011 Russian Duma Election and protest
 ![bots_around_election_2011](https://user-images.githubusercontent.com/65253017/165017137-72dc3c73-5033-49ca-84b6-80938350263f.png)
