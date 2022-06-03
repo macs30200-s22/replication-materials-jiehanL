@@ -1,0 +1,530 @@
+---
+title: "social bots"
+author: "jiehan liu"
+date: "4/15/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(dplyr)
+library(tidyverse)
+library(stringr)
+library(bit64)
+library(data.table)
+library(lubridate)
+library(ggplot2)
+library(zoo)
+library(MASS)
+library(Matrix)
+library(lme4)
+library(optimx)
+library(dfoptim)
+library(plyr)
+options(scipen=10)
+library(lubridate)
+library(estimatr)
+library(stargazer)
+library(reshape)
+```
+# bots data 
+
+```{r}
+tw <- get( load('tw.RData') )
+## Get total number of tweets per bot
+num_tw <- tw[, .('num_tw' = .N), by = 'userid']
+tw <- merge(x = tw, y = num_tw, by = 'userid')
+```
+
+# protest data
+### read in protest data 
+```{r}
+protest<-readxl::read_xlsx("~/Desktop/spring 22/perspective/replication-materials-jiehanL/Lankina__russia-protest-event--dataset-2007-2017.xlsx")
+```
+
+### national protest data 
+```{r}
+protest$date<-as.Date(protest$Date,format = "%Y-%m-%d")
+protest$year<-str_sub(protest$date,1,4)
+protest$month<-str_sub(protest$date,6,7)
+protest$ym<-str_sub(protest$date,1,7)
+protest$ym<-as.Date(as.yearmon(protest$ym))
+
+protest %>%
+  dplyr::count(ym) %>%
+  ggplot()+
+  geom_line(aes(x = ym, y = n, group=1)) +
+  geom_vline(xintercept = as.numeric(as.Date('2016-09-01')), linetype=4)+
+  geom_vline(xintercept = as.numeric(as.Date('2011-12-01')), linetype=4)+
+  geom_vline(xintercept = as.numeric(as.Date('2007-12-01')), linetype=4)+
+  annotate(geom = "text",
+           label = c("2007 Duma","2011 Duma","2016 Duma"),
+           x = c(as.Date('2008-09-01'),as.Date('2012-09-01'),as.Date('2016-01-01')),
+           y = 150)+
+  scale_y_continuous(limits = c(0, 150))+
+  scale_x_date(date_breaks = "year" , date_labels = "%Y")+
+  theme_bw()+
+  labs(x = "Year-Month", y = "Monthly observations")
+
+```
+
+### protest data by oblast and time 
+```{r}
+protest %>%
+  filter(`# protesters` >=20) %>%
+  group_by(Region) %>%
+  filter(n()!=1) %>%
+  ggplot()+
+  geom_line(aes(x = ym, y = `# protesters`)) +
+  geom_vline(xintercept = as.numeric(as.Date('2016-09-01')), linetype=4)+
+  geom_vline(xintercept = as.numeric(as.Date('2011-12-01')), linetype=4)+
+  scale_x_date(date_breaks = "year" , date_labels = "%y")+
+  labs(x = "Date", y = "Number of protesters in each protest")+
+  facet_wrap(~Region, scales = "free_y",ncol = 7)
+
+```
+
+
+
+# twitter data 
+### read in 
+```{r}
+setwd("~/Desktop/spring 22/perspective/social bots/2011_tweets")
+tbl_2011 <-
+    list.files(pattern = "*.csv") %>% 
+    map_df(~read.csv(.))
+
+setwd("~/Desktop/spring 22/perspective/social bots/2016_tweets")
+tbl_2016 <-
+    list.files(pattern = "*.csv") %>% 
+    map_df(~read.csv(.))
+
+tbl_2011<-tbl_2011 %>%
+  add_count(user_id)
+colnames(tbl_2011)[37] <- "tot_tweets_per_user"
+tbl_2011<-tbl_2011 %>%
+  add_count(date)
+colnames(tbl_2011)[38] <- "tot_tweets_per_day"
+
+
+tbl_2016<-tbl_2016 %>%
+  add_count(user_id)
+colnames(tbl_2016)[37] <- "tot_tweets_per_user"
+tbl_2016<-tbl_2016 %>%
+  add_count(date)
+colnames(tbl_2016)[38] <- "tot_tweets_per_day"
+
+```
+
+### mutate year-month variable 
+```{r}
+#tbl_2011$id<-as.character(tbl_2011$id)
+tbl_2011$ym<-str_sub(tbl_2011$date,1,7)
+tbl_2011$ym<-as.Date(as.yearmon(tbl_2011$ym))
+tbl_2016$ym<-str_sub(tbl_2016$date,1,7)
+tbl_2016$ym<-as.Date(as.yearmon(tbl_2016$ym))
+tbl_2011$date<-as.Date(tbl_2011$date)
+tbl_2016$date<-as.Date(tbl_2016$date)
+
+
+```
+
+### twitter data and duma election 
+```{r}
+png("tweets_around_election_2011.png", units="in", width=6, height=4, res=500)
+tbl_2011 %>%
+  ggplot+
+  geom_point(aes(x = date, y=tot_tweets_per_day))+
+  labs(x = "Date", y = "Daily observation of number of tweets")+
+  theme_bw()+
+  geom_vline(xintercept = as.numeric(as.Date('2011-12-04')), linetype=4)+
+  annotate(geom = "text",
+           label = c("2011 Duma Election"),
+           x = as.Date('2011-12-20'),
+           y = 12000)
+dev.off()
+
+png("tweets_around_election_2016.png", units="in", width=6, height=4, res=500)
+tbl_2016 %>%
+  ggplot+
+  geom_point(aes(x = date, y=tot_tweets_per_day))+
+  labs(x = "Date", y = "Daily observation of number of tweets")+
+  theme_bw()+
+  geom_vline(xintercept = as.numeric(as.Date('2016-09-18')), linetype=4)+
+  annotate(geom = "text",
+           label = c("2016 Duma Election"),
+           x = as.Date('2016-09-24'),
+           y = 8000)
+dev.off()
+```
+
+# mutate training dataset 
+```{r}
+## true tweets 
+set.seed(1000)
+true_user<-tbl_2016[!(tbl_2016$user_id %in% tw$userid), ] %>%
+filter(n<=1000) %>%
+sample_n(1500) %>%
+dplyr::select(user_id)
+
+true_tweets<-tbl_2016[tbl_2016$user_id %in% true_user$user_id, ]
+true_tweets<-true_tweets[,c(1,4,7,11,39)]
+true_tweets$bots<-0
+## remove urls 
+true_tweets$tweet<-str_trim(gsub('http\\S+\\s*',"", true_tweets$tweet))
+## remove puncuation but keep hashtags
+true_tweets$tweet<-gsub("[^#[:^punct:]]", "", true_tweets$tweet, perl=T)
+
+false_tweets<-tw %>%
+sample_n(100000)
+
+false_tweets<-false_tweets[,c(1:4,12)]
+false_tweets$bots<-1
+
+colnames(true_tweets) <- c("twid","date","userid","lemma","num_tw","bots" )
+true_tweets <- true_tweets[, c("userid","twid","date","lemma","num_tw","bots")]
+ground_true<-rbind(true_tweets,false_tweets)
+write.csv(ground_true, "bots_trainingdata.csv")
+```
+
+## process training data
+```{r}
+train <-rbind(tbl_2011,tbl_2016)
+train<-train[,c(1,4,7,11,39)]
+train$tweet<-str_trim(gsub('http\\S+\\s*',"", train$tweet))
+## remove puncuation but keep hashtags
+train$tweet<-gsub("[^#[:^punct:]]", "", train$tweet, perl=T)
+colnames(train) <- c("twid","date","userid","lemma","num_tw")
+train <- train[, c("userid","twid","date","lemma","num_tw")]
+write.csv(train,"bots_testing.csv")
+```
+
+# classification result 
+### data cleaning 
+```{r}
+cla_result <-read.csv("classification_result.csv")
+train<-cbind(train,cla_result)
+write.csv(train,"classification_result_all.csv")
+
+cla_not_bot<-train %>%
+  filter(X0 == 0) %>%
+  group_by(userid) %>%
+  dplyr::count(userid)
+
+cla_is_bot<-train %>%
+  filter(X0 == 1) %>%
+  group_by(userid) %>%
+  dplyr::count(userid)
+
+train<-left_join(train,cla_not_bot, by = 'userid')
+train<-left_join(train,cla_is_bot, by = 'userid')
+colnames(train) <- c("userid","twid","date","lemma","num_tw","cla_result","tot_not_bot","tot_is_bot")
+
+
+## for each of the users, once half of his/her tweets has been identified as bots'tweets, the user will be classified as social bots 
+bots_2016<-train %>%
+  filter(date >="2016-09-01") %>%
+  filter(date<= '2016-12-01') %>%
+  mutate(pct_not_bot = tot_not_bot/num_tw) %>%
+  mutate(pct_is_bot = tot_is_bot/num_tw) %>%
+  filter(pct_is_bot >=0.5) %>%
+  dplyr::count(userid)
+
+bots_2011<-train %>%
+  filter(date >="2011-10-31") %>%
+  filter(date<= '2012-01-30') %>%
+  mutate(pct_not_bot = tot_not_bot/num_tw) %>%
+  mutate(pct_is_bot = tot_is_bot/num_tw) %>%
+  filter(pct_is_bot >=0.5) %>%
+  dplyr::count(userid)
+
+## mark each user (bot or not)
+tbl_2016$is_bot[tbl_2016$user_id %in% bots_2016$userid]<-1
+tbl_2016$is_bot[!(tbl_2016$user_id %in% bots_2016$userid)]<-0
+
+tbl_2011$is_bot[tbl_2011$user_id %in% bots_2011$userid]<-1
+tbl_2011$is_bot[!(tbl_2011$user_id %in% bots_2011$userid)]<-0
+
+```
+
+### calculate social bots percentage
+```{r}
+tot_bot_per_day<-tbl_2016 %>%
+  filter(is_bot == 1) %>%
+  dplyr::count(date,is_bot) %>%
+  dplyr::select(date,n)
+
+tbl_2016_w_bot<-left_join(tbl_2016,tot_bot_per_day, by = 'date') 
+colnames(tbl_2016_w_bot)[40] <- "tot_bots_per_day"
+
+
+tot_bot_per_day_2011<-tbl_2011 %>%
+  filter(is_bot == 1) %>%
+  dplyr::count(date,is_bot)%>%
+  dplyr::select(date,n)
+
+tbl_2011_w_bot<-left_join(tbl_2011,tot_bot_per_day_2011, by = 'date') 
+colnames(tbl_2011_w_bot)[40] <- "tot_bots_per_day"
+
+tbl_2016_w_bot$date<-as.Date(tbl_2016_w_bot$date)
+
+png("bots_around_election_2016.png", units="in", width=6, height=4, res=500)
+tbl_2016_w_bot %>%
+  mutate(bot_pct = tot_bots_per_day/tot_tweets_per_day) %>%
+  ggplot()+
+  geom_point(aes(x = date, y = bot_pct ))+
+  geom_vline(xintercept = as.numeric(as.Date('2016-09-18')), linetype=4)+
+  theme_bw()+
+  labs(x = "Date", y = "Social bots percentage")+
+  annotate(geom = "text",
+           label = c("2016 Duma Election"),
+           x = as.Date('2016-09-24'),
+           y = 0.45)
+dev.off()
+
+png("bots_around_election_2011.png", units="in", width=6, height=4, res=500)
+tbl_2011_w_bot$date<-as.Date(tbl_2011_w_bot$date)
+tbl_2011_w_bot %>%
+  add_count(date) %>%
+  mutate(bot_pct = tot_bots_per_day/tot_tweets_per_day) %>%
+  ggplot()+
+  geom_point(aes(x = date, y = bot_pct ))+
+  geom_vline(xintercept = as.numeric(as.Date('2011-12-04')), linetype=4)+
+  geom_vline(xintercept = as.numeric(as.Date('2011-12-10')), linetype=4)+
+  geom_vline(xintercept = as.numeric(as.Date('2011-12-24')), linetype=4)+
+  annotate(geom = "text",
+           label = c("2011 Duma election\nFirst wave of protest\n(04/12-10/12)"),
+           x = as.Date('2011-11-28'),
+           y = 0.75)+
+  annotate(geom = "text",
+           label = c("2011 Duma election\nSecond wave of protest\n(24/12)"),
+           x = as.Date('2012-01-01'),
+           y = 0.75)+
+  theme_bw()+
+  labs(x = "Date", y = "Social bots percentage")
+dev.off()
+```
+
+# co-optation data
+```{r}
+## read in 
+cooptation<-read.csv("~/Desktop/spring 22/perspective/replication-materials-jiehanL/Annual information on the execution of the federal budget.csv")
+
+cooptation_mutate<-cooptation %>%
+  filter(X.1 %in% c("Department of Housing and Utilities","environmental protection","Education",
+                    "Culture, cinematography and media","Culture, cinematography","Health and Sports",
+                    "healthcare","Social politics","physical Culture and sport","Mass media"))
+
+cooptation_mutate<-cooptation_mutate[,c(2:14)]
+cooptation_mutate<-reshape(cooptation_mutate, 
+        direction = "long",
+        varying = list(names(cooptation_mutate)[2:13]),
+        v.names = "Value",
+        timevar = "Year",
+        times = 2006:2017)
+
+cooptation_mutate$Value<-as.numeric(cooptation_mutate$Value)
+cooptation_mutate$Value[is.na(cooptation_mutate$Value)] <- 0
+cooptation_mutate<-aggregate(cooptation_mutate$Value, by=list(year=cooptation_mutate$Year), FUN=sum)
+colnames(cooptation_mutate)<-c("year","copt_value")
+```
+
+# pipeline for full dataset 
+```{r}
+## read in 
+
+tbl_full <-
+  list.files(
+    path = "~/Desktop/spring 22/perspective/replication-materials-jiehanL/data_analysis_R/full_tweets_data/",
+    pattern = "*.csv",
+    full.names = T) %>% 
+  map_df(~read.csv(.))
+
+## mutate new variable 
+tbl_full<-tbl_full %>%
+  add_count(user_id)
+colnames(tbl_full)[37] <- "tot_tweets_per_user"
+tbl_full<-tbl_full %>%
+  add_count(date)
+colnames(tbl_full)[38] <- "tot_tweets_per_day"
+
+# test<-read.csv("~/Desktop/spring 22/perspective/replication-materials-jiehanL/data_analysis_R/full_tweets_data/#путин7.csv")
+# 
+# test %>%
+#   summarise(min(date))
+
+
+## ym variable 
+## full data
+tbl_full$ym<-str_sub(tbl_full$date,1,7)
+tbl_full$ym<-as.Date(as.yearmon(tbl_full$ym))
+tbl_full$date<-as.Date(tbl_full$date)
+
+tbl_full %>%
+  summarise(min(date))
+
+## plot 
+tbl_full %>%
+  ggplot+
+  geom_point(aes(x = date, y=tot_tweets_per_day))+
+  labs(x = "Date", y = "Daily observation of number of tweets")+
+  theme_bw()
+
+
+## #владимир.csv 2010-07-25 check 
+## #заявлять 2014-03-05 check 
+## #крым 2016-12-16	
+## #медведев 2014-07-12	check 
+## #Навальный "2010-11-16" check
+## #помощь 2014-06-19	
+## #президент 2013-08-14	
+## #путин 2016-05-12	
+## #россия 2016-06-06	
+## 
+
+
+## training data
+## remove puncuation but keep hashtags
+
+colnames(tbl_full)
+tbl_full_process<-tbl_full[,c(1,4,7,11,37)]
+tbl_full_process$tweet<-gsub("[^#[:^punct:]]", "", tbl_full_process$tweet, perl=T)
+colnames(tbl_full_process)
+colnames(tbl_full_process) <- c("twid","date","userid","lemma","num_tw")
+tbl_full_process <- tbl_full_process[, c("userid","twid","date","lemma","num_tw")]
+write.csv(tbl_full_process,"bots_testing_full.csv")
+
+
+## bots detection 
+cla_result <-read.csv("classification_result_full.csv")
+tbl_full_process<-cbind(tbl_full,cla_result)
+
+cla_not_bot<-tbl_full_process %>%
+  filter(X0 == 0) %>%
+  group_by(user_id) %>%
+  dplyr::count(user_id)
+
+cla_is_bot<-tbl_full_process %>%
+  filter(X0 == 1) %>%
+  group_by(user_id) %>%
+  dplyr::count(user_id)
+
+tbl_full_process<-left_join(tbl_full_process,cla_not_bot, by = 'user_id')
+tbl_full_process<-left_join(tbl_full_process,cla_is_bot, by = 'user_id')
+colnames(tbl_full_process)[40]<-"cla_result"
+colnames(tbl_full_process)[41]<-"tot_not_bot"
+colnames(tbl_full_process)[42]<-"tot_is_bot"
+
+
+## for each of the users, once half of his/her tweets has been identified as bots'tweets, the user will be classified as social bots 
+tbl_full_bots<-tbl_full_process %>%
+  mutate(pct_not_bot = tot_not_bot/tot_tweets_per_user) %>%
+  mutate(pct_is_bot = tot_is_bot/tot_tweets_per_user) %>%
+  filter(pct_is_bot >=0.8) %>%
+  dplyr::count(user_id)
+
+
+## mark each user (bot or not)
+tbl_full_process$is_bot[tbl_full_process$user_id %in% tbl_full_bots$user_id]<-1
+tbl_full_process$is_bot[!(tbl_full_process$user_id %in% tbl_full_bots$user_id)]<-0
+
+
+tot_bot_per_day<-tbl_full_process %>%
+  filter(is_bot == 1) %>%
+  dplyr::count(date,is_bot) %>%
+  dplyr::select(date,n)
+
+rm(tbl_full_w_bot)
+tbl_full_w_bot<-left_join(tbl_full_process,tot_bot_per_day, by = 'date') 
+colnames(tbl_full_w_bot)[44] <- "tot_bots_per_day"
+
+
+png("all_bots.png", units="in", width=6, height=4, res=500)
+tbl_full_w_bot %>%
+  mutate(bot_pct = tot_bots_per_day/tot_tweets_per_day) %>%
+  ggplot()+
+  geom_point(aes(x = date, y = bot_pct ))+
+  annotate(geom = "text",
+           label = c("Duma\nelection"),
+           x = as.Date('2011-05-28'),
+           y = 0.9)+
+   annotate(geom = "text",
+           label = c("Presidential\nelection"),
+           x = as.Date('2012-10-20'),
+           y = 0.75)+
+   annotate(geom = "text",
+           label = c("Duma\nElection"),
+           x = as.Date('2016-04-01'),
+           y = 0.9)+
+     annotate(geom = "text",
+           label = c("Crimea\nprotest"),
+           x = as.Date('2013-10-01'),
+           y = 0.9)+
+  geom_vline(xintercept = as.numeric(as.Date('2011-11-28')), linetype=4)+
+  geom_vline(xintercept = as.numeric(as.Date('2012-03-04')), linetype=4)+
+  geom_vline(xintercept = as.numeric(as.Date('2016-09-24')), linetype=4)+
+  geom_vline(xintercept = as.numeric(as.Date('2014-03-15')), linetype=4)+
+  theme_bw()+
+  labs(x = "Date", y = "Social bots percentage",
+       title = "Figure 1: Detected Tweets from Social Bots across Time")
+dev.off()
+
+
+```
+
+
+# effect of social bots deployment on social movement 
+### combine 
+```{r}
+
+## mutate variabel: day t-1
+tbl_full_w_bot$t_1<-ymd(tbl_full_w_bot$date)+1
+## bots date: 2016-05-10
+## mutate new var t_1: 2016-05-15, match with protest data on 2016-05-11,
+
+rm(tbl_full_w_bot_protest)
+tbl_full_w_bot_protest$year<-substr(tbl_full_w_bot_protest$date,1,4)
+tbl_full_w_bot_protest<-left_join(tbl_full_w_bot, protest, by = c("t_1" = "date"))
+tbl_full_w_bot_protest<-tbl_full_w_bot_protest[,c(1,4,5,7,11,37,38,40,41,43,44,46:70)]
+tbl_full_w_bot_protest<-tbl_full_w_bot_protest %>%
+  mutate(bot_pct = tot_bots_per_day/tot_tweets_per_day) 
+
+tbl_full_w_bot_protest<-tbl_full_w_bot_protest %>%
+  mutate(has_protest = case_when( is.na(`# protesters`) ~ 0,
+                                  !is.na(`# protesters`) ~1))
+tbl_full_w_bot_protest$year<-as.integer(tbl_full_w_bot_protest$year)
+tbl_full_w_bot_protest<-left_join(tbl_full_w_bot_protest,cooptation_mutate,by="year")
+# tbl_full_w_bot_protest %>%
+#   filter(has_protest ==1) %>%
+#   dplyr::select(bot_pct,has_protest,date) %>%
+#   ggplot()+
+#   geom_point(aes(x=date,y=bot_pct))
+
+tbl_full_w_bot  %>%
+  dplyr::count(time)
+#tbl_full_w_bot_protest$`Pre-Emptive Suppression`[, 29][is.na(tbl_full_w_bot_protest[, 29])] <- 0
+head(tbl_full_w_bot_protest)
+#tbl_full_w_bot_protest$`Pre-Emptive Suppression`
+
+model1<-glm(has_protest ~ bot_pct,data = tbl_full_w_bot_protest)
+model2<-glm(has_protest ~ bot_pct+log10(tot_tweets_per_day),data = tbl_full_w_bot_protest)
+model3<-glm(has_protest ~ bot_pct+log10(tot_tweets_per_day)+`Pre-Emptive Suppression`,data = tbl_full_w_bot_protest,na.action=na.omit)
+model4<-glm(has_protest ~ bot_pct+log10(tot_tweets_per_day)+`Pre-Emptive Suppression` + log10(copt_value),data = tbl_full_w_bot_protest,na.action=na.omit)
+
+
+stargazer(model1, model2, model3,model4, title="Baseline Estimation",
+align=TRUE, dep.var.labels=c("Occurance of Protest"),
+covariate.labels=c("social bots tweets proportion","total tweets (daily observations)_{log}",
+"pre-Emptive Suppression","material co-optation_{log}"),
+omit.stat=c("LL","ser","f"), no.space=TRUE)
+
+
+summary(model4)
+
+tbl_full_w_bot_protest$`Pre-Emptive Suppression`
+tbl_full_w_bot_protest$bot_pct<-tbl_full_w_bot_protest$bot_pct*100
+
+cor(tbl_full_w_bot_protest)
+
+
+```
+
